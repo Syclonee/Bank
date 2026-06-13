@@ -160,7 +160,7 @@ export default function App() {
           </div>
         </header>
 
-        <div className="p-5 md:p-8">
+        <div className="p-5 md:p-8 pb-28 md:pb-8">
           {loading && !dashboard ? (
             <div className="text-center text-ink-500 py-20 num">טוען נתונים...</div>
           ) : !dashboard || (dashboard.summary.count === 0 && month === 'all') ? (
@@ -193,6 +193,31 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* ניווט תחתון - נייד בלבד */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-line/70 bg-bg/90 backdrop-blur-xl px-2 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex items-stretch justify-around">
+          {NAV.map((n) => (
+            <button
+              key={n.id}
+              onClick={() => setView(n.id)}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold transition ${
+                view === n.id ? 'text-brand-300' : 'text-ink-500'
+              }`}
+            >
+              <span className={`text-lg ${view === n.id ? 'drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]' : ''}`}>{n.icon}</span>
+              {n.label}
+            </button>
+          ))}
+          <button
+            onClick={() => setImportOpen(true)}
+            className="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold text-accent-400"
+          >
+            <span className="text-lg">＋</span>
+            ייבוא
+          </button>
+        </div>
+      </nav>
 
       <ImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={afterImport} />
     </div>
