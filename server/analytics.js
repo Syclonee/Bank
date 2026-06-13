@@ -1,5 +1,5 @@
 // חישובי סטטיסטיקה לדשבורד: סיכומים, פילוח קטגוריות, ממוצעים ומגמות חודשיות.
-import { CATEGORIES, CATEGORY_MAP } from './categories.js';
+import { CATEGORIES, getCategoryMeta } from './categories.js';
 
 function monthKey(dateStr) {
   return dateStr.slice(0, 7); // YYYY-MM
@@ -50,7 +50,7 @@ export function byCategory(txs) {
 
   return Object.entries(groups)
     .map(([id, g]) => {
-      const meta = CATEGORY_MAP[id] || { name: id, color: '#a1a1aa', icon: '📦' };
+      const meta = getCategoryMeta(id);
       return {
         id,
         name: meta.name,
@@ -77,7 +77,7 @@ export function monthlyAveragesByCategory(allTxs) {
   }
   return Object.entries(totals)
     .map(([id, total]) => {
-      const meta = CATEGORY_MAP[id] || { name: id, color: '#a1a1aa', icon: '📦' };
+      const meta = getCategoryMeta(id);
       return {
         id,
         name: meta.name,

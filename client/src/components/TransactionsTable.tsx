@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Transaction, Category } from '../types';
 import { formatCurrency, formatDate } from '../utils/format';
 
@@ -9,7 +9,10 @@ interface Props {
 }
 
 export default function TransactionsTable({ transactions, categories, onChangeCategory }: Props) {
-  const catMap = Object.fromEntries(categories.map((c) => [c.id, c]));
+  const catMap = useMemo(
+    () => Object.fromEntries(categories.map((c) => [c.id, c])),
+    [categories]
+  );
   const [editing, setEditing] = useState<string | null>(null);
 
   if (!transactions.length) {

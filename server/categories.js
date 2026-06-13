@@ -19,6 +19,11 @@ export const CATEGORIES = [
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 
+// מטא-דאטה של קטגוריה לפי מזהה, עם נפילה לקטגוריית "אחר" עבור מזהה לא מוכר.
+export function getCategoryMeta(id) {
+  return CATEGORY_MAP[id] || { ...CATEGORY_MAP.other, id, name: id };
+}
+
 // חוקי סיווג: כל מילת מפתח (חלקית, לא רגישה לאותיות) ממופה לקטגוריה.
 // סדר החוקים = סדר העדיפות. קטגוריות ספציפיות מופיעות לפני כלליות יותר כדי
 // למנוע התאמות שווא (למשל "סופר פארם" -> בריאות לפני "סופר" -> סופרמרקט).
