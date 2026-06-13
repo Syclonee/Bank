@@ -45,10 +45,13 @@ export default function TransactionsTable({ transactions, categories, onChangeCa
                   autoFocus
                   defaultValue={t.category}
                   onChange={(e) => {
-                    onChangeCategory(t.id, e.target.value);
+                    const value = e.target.value;
+                    // סוגרים את העריכה רק אם הקטגוריה באמת השתנתה
+                    if (value !== t.category) onChangeCategory(t.id, value);
                     setEditing(null);
                   }}
-                  onBlur={() => setEditing(null)}
+                  // סגירה ביציאת פוקוס - בהשהיה קצרה כדי ש-onChange (אם ממתין) יספיק לרוץ
+                  onBlur={() => setTimeout(() => setEditing(null), 150)}
                   className="text-xs rounded-lg border border-slate-200 px-2 py-1 bg-white"
                 >
                   {categories.map((c) => (

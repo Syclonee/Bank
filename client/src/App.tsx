@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from './api';
 import type { Category, DashboardData, Transaction } from './types';
 import { formatCurrency, formatMonth, greeting } from './utils/format';
@@ -39,14 +39,19 @@ export default function App() {
     }
   }
 
+  // מזהה בקשה עולה: תשובות שמגיעות מחוץ לסדר (בקשה ישנה שהסתיימה מאוחר) נזרקות,
+  // כדי שהטבלה תמיד תשקף את הסינון/החיפוש הנוכחי.
+  const txReqId = useRef(0);
+
   async function loadTransactions() {
+    const reqId = ++txReqId.current;
     const data = await api.transactions({
       month,
       category: catFilter,
       q: query,
       limit: 300,
     });
-    setTransactions(data);
+    if (reqId === txReqId.current) setTransactions(data);
   }
 
   useEffect(() => {
@@ -57,8 +62,11 @@ export default function App() {
     loadDashboard(month);
   }, [month]);
 
+  // טעינת תנועות עם debounce - מונע ירי בקשה על כל הקשה בתיבת החיפוש.
   useEffect(() => {
-    if (view === 'transactions') loadTransactions();
+    if (view !== 'transactions') return;
+    const t = setTimeout(loadTransactions, 250);
+    return () => clearTimeout(t);
   }, [view, month, catFilter, query]);
 
   async function handleChangeCategory(id: string, category: string) {
@@ -154,7 +162,7 @@ export default function App() {
         <div className="p-5 md:p-8">
           {loading && !dashboard ? (
             <div className="text-center text-ink-400 py-20">טוען נתונים...</div>
-          ) : !dashboard || dashboard.summary.count === 0 && month === 'all' ? (
+          ) : !dashboard || (dashboard.summary.count === 0 && month === 'all') ? (
             <EmptyState onImport={() => setImportOpen(true)} />
           ) : (
             <>

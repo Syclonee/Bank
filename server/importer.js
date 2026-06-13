@@ -9,9 +9,46 @@ export function makeHash({ date, amount, description, account }) {
     .digest('hex');
 }
 
+// מנתח תאריך בפורמטים נפוצים. ברירת המחדל בישראל היא יום-תחילה (DD/MM/YYYY).
+// מחזיר אובייקט Date תקין או null.
+export function parseDate(value) {
+  if (value instanceof Date) return isNaN(value) ? null : value;
+  if (value == null) return null;
+  const str = String(value).trim();
+  if (!str) return null;
+
+  // פורמט ISO (YYYY-MM-DD) או עם שעה - JS מנתח נכון
+  if (/^\d{4}-\d{1,2}-\d{1,2}/.test(str)) {
+    const d = new Date(str);
+    return isNaN(d) ? null : d;
+  }
+
+  // DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY (יום-תחילה כמקובל בישראל)
+  const m = str.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})$/);
+  if (m) {
+    let day = Number(m[1]);
+    let month = Number(m[2]);
+    let year = Number(m[3]);
+    // אם החלק השני בלבד יכול להיות יום - כנראה פורמט אמריקאי MM/DD, נחליף
+    if (month > 12 && day <= 12) {
+      [day, month] = [month, day];
+    }
+    if (year < 100) year += 2000;
+    const d = new Date(year, month - 1, day);
+    // ולידציה שהתאריך לא "גלש" (למשל 31/02)
+    if (isNaN(d) || d.getDate() !== day || d.getMonth() !== month - 1) return null;
+    return d;
+  }
+
+  const d = new Date(str);
+  return isNaN(d) ? null : d;
+}
+
 // בונה אובייקט תנועה מנורמל מתוך שדות גולמיים.
 export function buildTransaction({ date, amount, description, account, category }) {
-  const normalizedDate = new Date(date).toISOString().slice(0, 10);
+  const parsed = parseDate(date);
+  if (!parsed) throw new Error(`תאריך לא תקין: ${date}`);
+  const normalizedDate = parsed.toISOString().slice(0, 10);
   const amt = Number(amount);
   const desc = (description || '').trim();
   const hash = makeHash({ date: normalizedDate, amount: amt, description: desc, account });
@@ -79,7 +116,7 @@ export function parseCSV(text, account = 'CSV') {
       }
     }
 
-    if (!dateRaw || isNaN(new Date(dateRaw))) continue;
+    if (!parseDate(dateRaw)) continue;
     if (!amount) continue;
 
     txs.push(buildTransaction({ date: dateRaw, amount, description: desc, account }));
@@ -89,7 +126,10 @@ export function parseCSV(text, account = 'CSV') {
 
 function parseAmount(str) {
   if (!str) return 0;
-  const cleaned = str.replace(/[₪$€,\s]/g, '').replace(/[^\d.\-]/g, '');
+  // סוגריים מסמנים סכום שלילי בחלק מהיצואים (חשבונאי): (50.00) = -50
+  const negative = /^\s*\(.*\)\s*$/.test(str) || str.includes('-');
+  const cleaned = str.replace(/[()₪$€,\s]/g, '').replace(/[^\d.]/g, '');
   const n = parseFloat(cleaned);
-  return isNaN(n) ? 0 : n;
+  if (isNaN(n)) return 0;
+  return negative ? -Math.abs(n) : n;
 }
