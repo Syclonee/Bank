@@ -71,6 +71,31 @@ export const api = {
     return { total: demo.length };
   },
 
+  // ייצוא כל הנתונים כמחרוזת JSON (לגיבוי / העברה בין מכשירים)
+  async exportBackup(): Promise<string> {
+    const transactions = await getTransactions();
+    return JSON.stringify(
+      { app: 'nova', version: 1, exportedAt: new Date().toISOString(), transactions },
+      null,
+      2
+    );
+  },
+
+  // שחזור מגיבוי - ממזג עם הקיים (מניעת כפילויות לפי hash)
+  async restoreBackup(text: string) {
+    let data: unknown;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error('קובץ גיבוי לא תקין');
+    }
+    const txs = (data as { transactions?: Transaction[] })?.transactions;
+    if (!Array.isArray(txs)) throw new Error('קובץ הגיבוי אינו בפורמט הצפוי');
+    const valid = txs.filter((t) => t && t.hash && t.date && typeof t.amount === 'number');
+    const result = await upsertTransactions(valid);
+    return { restored: valid.length, ...result };
+  },
+
   async clearData() {
     await clearTransactions();
   },

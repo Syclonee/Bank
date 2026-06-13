@@ -87,6 +87,12 @@ export default function App() {
     if (view === 'transactions') loadTransactions();
   }
 
+  async function handleCleared() {
+    setMonth('all');
+    await loadDashboard('all');
+    if (view === 'transactions') loadTransactions();
+  }
+
   const months = dashboard?.months ?? [];
 
   return (
@@ -226,7 +232,12 @@ export default function App() {
         </div>
       </nav>
 
-      <ImportModal open={importOpen} onClose={() => setImportOpen(false)} onImported={afterImport} />
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImported={afterImport}
+        onCleared={handleCleared}
+      />
     </div>
   );
 }
