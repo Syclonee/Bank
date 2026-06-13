@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+npm-debug.log*
+
+# נתונים פרטיים ופרטי התחברות - לעולם לא נכנסים לגיט
+server/data/*.json
+!server/data/.gitkeep
+server/data/transactions.json
+server/data/accounts.json
+.env
+.env.local
+credentials.json
