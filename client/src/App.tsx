@@ -80,6 +80,13 @@ export default function App() {
     if (view === 'transactions') loadTransactions();
   }
 
+  async function handleLoadDemo() {
+    await api.loadDemo();
+    setMonth('all');
+    await loadDashboard('all');
+    if (view === 'transactions') loadTransactions();
+  }
+
   const months = dashboard?.months ?? [];
 
   return (
@@ -164,7 +171,7 @@ export default function App() {
           {loading && !dashboard ? (
             <div className="text-center text-ink-500 py-20 num">טוען נתונים...</div>
           ) : !dashboard || (dashboard.summary.count === 0 && month === 'all') ? (
-            <EmptyState onImport={() => setImportOpen(true)} />
+            <EmptyState onImport={() => setImportOpen(true)} onLoadDemo={handleLoadDemo} />
           ) : (
             <>
               {view === 'overview' && dashboard && (
@@ -339,21 +346,29 @@ function AveragesView({ dashboard }: { dashboard: DashboardData }) {
   );
 }
 
-function EmptyState({ onImport }: { onImport: () => void }) {
+function EmptyState({ onImport, onLoadDemo }: { onImport: () => void; onLoadDemo: () => void }) {
   return (
     <div className="card p-12 text-center max-w-xl mx-auto mt-10 shadow-glow">
       <div className="text-5xl mb-4">📊</div>
       <h2 className="text-xl font-display font-bold text-ink-50 mb-2">אין עדיין נתונים</h2>
       <p className="text-ink-400 mb-6 leading-relaxed">
-        ייבא קובץ CSV מהבנק או מכרטיס האשראי כדי להתחיל לעקוב, או הרץ{' '}
-        <code className="num bg-surface2 border border-line px-1.5 py-0.5 rounded text-sm text-brand-300">npm run seed</code> ליצירת נתוני דמו.
+        ייבא קובץ CSV מהבנק או מכרטיס האשראי כדי להתחיל לעקוב, או טען נתוני דמו כדי
+        להתרשם מהדשבורד. כל המידע נשמר על המכשיר שלך בלבד.
       </p>
-      <button
-        onClick={onImport}
-        className="bg-gradient-to-l from-brand-400 to-accent-500 text-bg font-bold rounded-2xl px-6 py-3 transition hover:opacity-90 shadow-glow"
-      >
-        ＋ ייבוא תנועות
-      </button>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <button
+          onClick={onImport}
+          className="bg-gradient-to-l from-brand-400 to-accent-500 text-bg font-bold rounded-2xl px-6 py-3 transition hover:opacity-90 shadow-glow"
+        >
+          ＋ ייבוא תנועות
+        </button>
+        <button
+          onClick={onLoadDemo}
+          className="pill px-6 py-3 font-semibold text-ink-100 hover:border-brand-400/50 transition"
+        >
+          טען נתוני דמו
+        </button>
+      </div>
     </div>
   );
 }

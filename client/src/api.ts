@@ -1,46 +1,77 @@
+// שכבת נתונים מקומית - רצה כולה בדפדפן (ללא שרת). הנתונים נשמרים ב-IndexedDB.
 import type { DashboardData, Transaction, Category } from './types';
-
-const BASE = '/api';
-
-async function get<T>(url: string): Promise<T> {
-  const res = await fetch(BASE + url);
-  if (!res.ok) throw new Error(`שגיאה בטעינה: ${res.status}`);
-  return res.json();
-}
+import { CATEGORIES } from './lib/categories';
+import { parseCSV } from './lib/importer';
+import {
+  getTransactions,
+  upsertTransactions,
+  updateTransactionCategory,
+  saveTransactions,
+  clearTransactions,
+} from './lib/store';
+import {
+  summary,
+  byCategory,
+  monthlyAveragesByCategory,
+  monthlyTrend,
+  filterByMonth,
+  listMonths,
+} from './lib/analytics';
+import { generateDemo } from './lib/demo';
 
 export const api = {
-  dashboard: (month: string) => get<DashboardData>(`/dashboard?month=${encodeURIComponent(month)}`),
-
-  categories: () => get<Category[]>(`/categories`),
-
-  transactions: (params: { month?: string; category?: string; q?: string; limit?: number }) => {
-    const qs = new URLSearchParams();
-    if (params.month) qs.set('month', params.month);
-    if (params.category) qs.set('category', params.category);
-    if (params.q) qs.set('q', params.q);
-    if (params.limit) qs.set('limit', String(params.limit));
-    return get<Transaction[]>(`/transactions?${qs.toString()}`);
+  async dashboard(month: string): Promise<DashboardData> {
+    const all = await getTransactions();
+    const scoped = filterByMonth(all, month);
+    return {
+      month,
+      months: listMonths(all),
+      summary: summary(scoped),
+      categories: byCategory(scoped),
+      monthlyAverages: monthlyAveragesByCategory(all),
+      trend: monthlyTrend(all),
+    };
   },
 
-  updateCategory: async (id: string, category: string) => {
-    const res = await fetch(`${BASE}/transactions/${id}/category`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category }),
-    });
-    if (!res.ok) throw new Error('עדכון נכשל');
-    return res.json();
+  async categories(): Promise<Category[]> {
+    return CATEGORIES;
   },
 
-  importCSV: async (csv: string, account: string) => {
-    const res = await fetch(`${BASE}/import/csv`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csv, account }),
-    });
-    if (!res.ok) throw new Error('ייבוא נכשל');
-    return res.json() as Promise<{ parsed: number; added: number; total: number }>;
+  async transactions(params: {
+    month?: string;
+    category?: string;
+    q?: string;
+    limit?: number;
+  }): Promise<Transaction[]> {
+    let txs = await getTransactions();
+    if (params.month && params.month !== 'all') txs = filterByMonth(txs, params.month);
+    if (params.category && params.category !== 'all') txs = txs.filter((t) => t.category === params.category);
+    if (params.q) {
+      const needle = params.q.toLowerCase();
+      txs = txs.filter((t) => t.description.toLowerCase().includes(needle));
+    }
+    if (params.limit) txs = txs.slice(0, params.limit);
+    return txs;
   },
 
-  scrapeStatus: () => get<{ available: boolean }>(`/scrape/status`),
+  async updateCategory(id: string, category: string) {
+    return updateTransactionCategory(id, category);
+  },
+
+  async importCSV(csv: string, account: string) {
+    const parsed = parseCSV(csv, account);
+    const result = await upsertTransactions(parsed);
+    return { parsed: parsed.length, ...result };
+  },
+
+  // טעינת נתוני דמו (מחליף את הקיימים)
+  async loadDemo() {
+    const demo = generateDemo();
+    await saveTransactions(demo);
+    return { total: demo.length };
+  },
+
+  async clearData() {
+    await clearTransactions();
+  },
 };

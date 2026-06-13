@@ -1,0 +1,11 @@
+# הגדרות פריסה ל-Netlify (אירוח סטטי חינמי).
+# מחברים את הריפו ל-Netlify והאתר נבנה ומתפרסם אוטומטית בכל push.
+[build]
+  base = "client"
+  command = "npm install && npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
