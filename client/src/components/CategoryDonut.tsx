@@ -7,6 +7,15 @@ interface Props {
   totalExpense: number;
 }
 
+const tooltipStyle = {
+  borderRadius: 12,
+  border: '1px solid #1c2742',
+  background: 'rgba(12,19,34,0.95)',
+  boxShadow: '0 0 24px -8px rgba(34,211,238,0.4)',
+  fontFamily: 'Heebo, sans-serif',
+  color: '#e2e8f0',
+};
+
 export default function CategoryDonut({ data, totalExpense }: Props) {
   const chartData = data.slice(0, 8);
 
@@ -20,10 +29,11 @@ export default function CategoryDonut({ data, totalExpense }: Props) {
             nameKey="name"
             cx="50%"
             cy="50%"
-            innerRadius={70}
-            outerRadius={100}
-            paddingAngle={2}
-            stroke="none"
+            innerRadius={72}
+            outerRadius={102}
+            paddingAngle={3}
+            stroke="#0c1322"
+            strokeWidth={2}
           >
             {chartData.map((entry) => (
               <Cell key={entry.id} fill={entry.color} />
@@ -31,18 +41,14 @@ export default function CategoryDonut({ data, totalExpense }: Props) {
           </Pie>
           <Tooltip
             formatter={(value: number, name: string) => [formatCurrency(value), name]}
-            contentStyle={{
-              borderRadius: 12,
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 8px 24px -8px rgba(15,23,42,0.2)',
-              fontFamily: 'Heebo, sans-serif',
-            }}
+            contentStyle={tooltipStyle}
+            itemStyle={{ color: '#e2e8f0' }}
           />
         </PieChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span className="text-xs text-ink-400 font-medium">סך הוצאות</span>
-        <span className="text-2xl font-extrabold text-ink-900">{formatCurrency(totalExpense)}</span>
+        <span className="eyebrow">סך הוצאות</span>
+        <span className="num text-2xl font-bold text-ink-50 mt-1">{formatCurrency(totalExpense)}</span>
       </div>
     </div>
   );

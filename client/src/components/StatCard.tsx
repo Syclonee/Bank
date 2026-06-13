@@ -5,31 +5,30 @@ interface Props {
   value: number;
   icon: string;
   tone: 'income' | 'expense' | 'balance' | 'savings';
-  suffix?: string;
   isPercent?: boolean;
 }
 
-const TONES: Record<Props['tone'], { bg: string; text: string; ring: string }> = {
-  income: { bg: 'bg-emerald-50', text: 'text-emerald-600', ring: 'ring-emerald-100' },
-  expense: { bg: 'bg-rose-50', text: 'text-rose-600', ring: 'ring-rose-100' },
-  balance: { bg: 'bg-brand-50', text: 'text-brand-600', ring: 'ring-brand-100' },
-  savings: { bg: 'bg-amber-50', text: 'text-amber-600', ring: 'ring-amber-100' },
+const TONES: Record<Props['tone'], { text: string; glow: string; bar: string }> = {
+  income: { text: 'text-emerald-300', glow: 'shadow-[0_0_24px_-10px_rgba(52,211,153,0.7)]', bar: 'from-emerald-400/80' },
+  expense: { text: 'text-rose-300', glow: 'shadow-[0_0_24px_-10px_rgba(251,113,133,0.7)]', bar: 'from-rose-400/80' },
+  balance: { text: 'text-brand-300', glow: 'shadow-[0_0_24px_-10px_rgba(34,211,238,0.7)]', bar: 'from-brand-400/80' },
+  savings: { text: 'text-accent-400', glow: 'shadow-[0_0_24px_-10px_rgba(168,85,247,0.7)]', bar: 'from-accent-400/80' },
 };
 
 export default function StatCard({ label, value, icon, tone, isPercent }: Props) {
   const t = TONES[tone];
   return (
-    <div className="card p-5 flex items-center gap-4">
-      <div
-        className={`h-12 w-12 rounded-2xl ${t.bg} ${t.text} ring-4 ${t.ring} flex items-center justify-center text-xl shrink-0`}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <div className="text-sm text-ink-500 font-medium">{label}</div>
-        <div className={`text-2xl font-extrabold tracking-tight ${tone === 'balance' && value < 0 ? 'text-rose-600' : 'text-ink-900'}`}>
-          {isPercent ? `${value}%` : formatCurrency(value)}
+    <div className="card relative overflow-hidden p-5">
+      {/* קו זוהר עליון */}
+      <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-l ${t.bar} to-transparent`} />
+      <div className="flex items-center justify-between">
+        <span className="eyebrow">{label}</span>
+        <div className={`h-9 w-9 rounded-xl border border-line bg-surface2/80 flex items-center justify-center text-base ${t.text} ${t.glow}`}>
+          {icon}
         </div>
+      </div>
+      <div className={`mt-3 num text-[26px] font-bold tracking-tight ${tone === 'balance' && value < 0 ? 'text-rose-300' : 'text-ink-50'}`}>
+        {isPercent ? `${value}%` : formatCurrency(value)}
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
@@ -14,28 +14,46 @@ body,
 
 body {
   margin: 0;
-  background: #f6f7fb;
-  color: #0f172a;
+  color: #e2e8f0;
+  font-family: 'Heebo', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-feature-settings: 'tnum';
+  background-color: #060912;
+  /* זוהר רקע + רשת נקודות עדינה לתחושה טכנולוגית */
+  background-image:
+    radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.10), transparent 60%),
+    radial-gradient(800px 500px at 0% 100%, rgba(168, 85, 247, 0.10), transparent 60%),
+    radial-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: auto, auto, 26px 26px;
+  background-attachment: fixed;
 }
 
-/* פס גלילה עדין */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #1c2742;
   border-radius: 999px;
-  border: 2px solid #f6f7fb;
+  border: 2px solid #060912;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #2a3a5e;
 }
 
 @layer components {
+  /* כרטיס זכוכית כהה עם מסגרת דקה וזוהר עדין */
   .card {
-    @apply bg-white rounded-3xl shadow-card border border-slate-100;
+    @apply rounded-3xl border border-line/70 bg-surface/70 backdrop-blur-xl shadow-card;
+  }
+  .pill {
+    @apply rounded-xl border border-line bg-surface2/60 text-ink-50;
+  }
+  /* כותרת מקטע בסגנון "מסוף" */
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-brand-400;
+  }
+  .num {
+    @apply font-mono tabular-nums;
   }
 }

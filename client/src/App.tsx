@@ -85,14 +85,14 @@ export default function App() {
   return (
     <div className="min-h-screen flex">
       {/* סרגל צד */}
-      <aside className="w-64 shrink-0 bg-white border-l border-slate-100 p-5 hidden md:flex flex-col gap-2">
-        <div className="flex items-center gap-2.5 px-2 mb-6">
-          <div className="h-9 w-9 rounded-xl bg-brand-600 text-white flex items-center justify-center font-extrabold">
+      <aside className="w-64 shrink-0 border-l border-line/70 bg-surface/60 backdrop-blur-xl p-5 hidden md:flex flex-col gap-2">
+        <div className="flex items-center gap-3 px-1 mb-7">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-400 to-accent-500 text-bg flex items-center justify-center font-display font-bold text-lg shadow-glow">
             ₪
           </div>
           <div>
-            <div className="font-extrabold text-ink-900 leading-tight">כספומטר</div>
-            <div className="text-xs text-ink-400">מעקב הוצאות</div>
+            <div className="font-display font-bold text-ink-50 leading-tight tracking-wide">NOVA</div>
+            <div className="eyebrow">finance os</div>
           </div>
         </div>
 
@@ -101,10 +101,10 @@ export default function App() {
             <button
               key={n.id}
               onClick={() => setView(n.id)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold transition ${
+              className={`relative flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-semibold transition ${
                 view === n.id
-                  ? 'bg-brand-50 text-brand-700'
-                  : 'text-ink-500 hover:bg-slate-50 hover:text-ink-700'
+                  ? 'bg-brand-400/10 text-brand-300 border border-brand-400/30 shadow-glow'
+                  : 'text-ink-400 hover:bg-surface2/60 hover:text-ink-100 border border-transparent'
               }`}
             >
               <span className="text-lg">{n.icon}</span>
@@ -116,11 +116,12 @@ export default function App() {
         <div className="mt-auto">
           <button
             onClick={() => setImportOpen(true)}
-            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-2xl py-2.5 text-sm transition"
+            className="w-full bg-gradient-to-l from-brand-400 to-accent-500 text-bg font-bold rounded-2xl py-2.5 text-sm transition hover:opacity-90 shadow-glow"
           >
             ＋ ייבוא תנועות
           </button>
-          <p className="text-[11px] text-ink-400 mt-3 leading-relaxed px-1">
+          <p className="text-[11px] text-ink-500 mt-3 leading-relaxed px-1">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 align-middle ml-1 shadow-[0_0_8px_#34d399]" />
             קריאה בלבד · הנתונים נשמרים מקומית במחשב שלך בלבד
           </p>
         </div>
@@ -129,19 +130,19 @@ export default function App() {
       {/* תוכן ראשי */}
       <main className="flex-1 min-w-0">
         {/* כותרת עליונה */}
-        <header className="sticky top-0 z-20 bg-[#f6f7fb]/80 backdrop-blur-md px-5 md:px-8 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100">
+        <header className="sticky top-0 z-20 bg-bg/70 backdrop-blur-xl px-5 md:px-8 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-line/70">
           <div>
-            <h1 className="text-xl md:text-2xl font-extrabold text-ink-900">
+            <div className="eyebrow mb-0.5">dashboard</div>
+            <h1 className="text-xl md:text-2xl font-display font-bold text-ink-50">
               {greeting()} 👋
             </h1>
-            <p className="text-sm text-ink-400">סקירת ההוצאות וההכנסות שלך</p>
           </div>
 
           <div className="flex items-center gap-2">
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-200 outline-none"
+              className="pill px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-400/40 outline-none"
             >
               <option value="all">כל התקופה</option>
               {months.map((m) => (
@@ -152,7 +153,7 @@ export default function App() {
             </select>
             <button
               onClick={() => setImportOpen(true)}
-              className="md:hidden bg-brand-600 text-white font-semibold rounded-xl px-3 py-2 text-sm"
+              className="md:hidden bg-gradient-to-l from-brand-400 to-accent-500 text-bg font-bold rounded-xl px-3 py-2 text-sm"
             >
               ＋
             </button>
@@ -161,7 +162,7 @@ export default function App() {
 
         <div className="p-5 md:p-8">
           {loading && !dashboard ? (
-            <div className="text-center text-ink-400 py-20">טוען נתונים...</div>
+            <div className="text-center text-ink-500 py-20 num">טוען נתונים...</div>
           ) : !dashboard || (dashboard.summary.count === 0 && month === 'all') ? (
             <EmptyState onImport={() => setImportOpen(true)} />
           ) : (
@@ -218,22 +219,22 @@ function Overview({
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <section className="card p-6 lg:col-span-3">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-extrabold text-ink-900">מגמה חודשית</h2>
-            <span className="text-xs text-ink-400">הכנסות מול הוצאות</span>
+            <h2 className="font-display font-bold text-ink-50">מגמה חודשית</h2>
+            <span className="eyebrow">income / expense</span>
           </div>
           <TrendChart data={trend} />
         </section>
 
         <section className="card p-6 lg:col-span-2">
-          <h2 className="font-extrabold text-ink-900 mb-2">פילוח הוצאות</h2>
+          <h2 className="font-display font-bold text-ink-50 mb-2">פילוח הוצאות</h2>
           <CategoryDonut data={categories} totalExpense={summary.expense} />
         </section>
       </div>
 
       <section className="card p-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-extrabold text-ink-900">הוצאות לפי קטגוריה</h2>
-          <span className="text-xs text-ink-400">לחיצה על קטגוריה מציגה את התנועות</span>
+          <h2 className="font-display font-bold text-ink-50">הוצאות לפי קטגוריה</h2>
+          <span className="eyebrow">tap to filter</span>
         </div>
         <CategoryList data={categories} onSelect={onSelectCategory} />
       </section>
@@ -265,12 +266,12 @@ function TransactionsView({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="🔍 חיפוש בית עסק..."
-          className="flex-1 min-w-[180px] rounded-xl border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-200 outline-none"
+          className="flex-1 min-w-[180px] rounded-xl border border-line bg-surface2/60 px-3 py-2 text-sm text-ink-50 placeholder:text-ink-500 focus:ring-2 focus:ring-brand-400/40 focus:border-brand-400/50 outline-none"
         />
         <select
           value={catFilter}
           onChange={(e) => setCatFilter(e.target.value)}
-          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-200 outline-none"
+          className="pill px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-400/40 outline-none"
         >
           <option value="all">כל הקטגוריות</option>
           {categories.map((c) => (
@@ -299,13 +300,13 @@ function AveragesView({ dashboard }: { dashboard: DashboardData }) {
     <div className="space-y-6">
       <div className="card p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-extrabold text-ink-900">הוצאה חודשית ממוצעת לכל קטגוריה</h2>
-          <span className="text-sm font-bold text-ink-900">
+          <h2 className="font-display font-bold text-ink-50">הוצאה חודשית ממוצעת לכל קטגוריה</h2>
+          <span className="num text-sm font-bold text-brand-300">
             סה"כ {formatCurrency(totalMonthlyAvg)} / חודש
           </span>
         </div>
-        <p className="text-xs text-ink-400 mb-5">
-          מחושב על פני {numMonths} חודשי נתונים
+        <p className="eyebrow mb-5">
+          avg over {numMonths} months
         </p>
         <AveragesPanel data={dashboard.monthlyAverages} />
       </div>
@@ -315,16 +316,16 @@ function AveragesView({ dashboard }: { dashboard: DashboardData }) {
 
 function EmptyState({ onImport }: { onImport: () => void }) {
   return (
-    <div className="card p-12 text-center max-w-xl mx-auto mt-10">
+    <div className="card p-12 text-center max-w-xl mx-auto mt-10 shadow-glow">
       <div className="text-5xl mb-4">📊</div>
-      <h2 className="text-xl font-extrabold text-ink-900 mb-2">אין עדיין נתונים</h2>
-      <p className="text-ink-500 mb-6 leading-relaxed">
+      <h2 className="text-xl font-display font-bold text-ink-50 mb-2">אין עדיין נתונים</h2>
+      <p className="text-ink-400 mb-6 leading-relaxed">
         ייבא קובץ CSV מהבנק או מכרטיס האשראי כדי להתחיל לעקוב, או הרץ{' '}
-        <code className="bg-slate-100 px-1.5 py-0.5 rounded text-sm">npm run seed</code> ליצירת נתוני דמו.
+        <code className="num bg-surface2 border border-line px-1.5 py-0.5 rounded text-sm text-brand-300">npm run seed</code> ליצירת נתוני דמו.
       </p>
       <button
         onClick={onImport}
-        className="bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-2xl px-6 py-3 transition"
+        className="bg-gradient-to-l from-brand-400 to-accent-500 text-bg font-bold rounded-2xl px-6 py-3 transition hover:opacity-90 shadow-glow"
       >
         ＋ ייבוא תנועות
       </button>
